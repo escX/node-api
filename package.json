@@ -1,0 +1,15 @@
+{
+  "name": "node-api",
+  "version": "1.0.0",
+  "description": "provide api with nodejs",
+  "main": "index.js",
+  "scripts": {
+    "serve": "node serve.js"
+  },
+  "author": "escX",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "superagent": "^5.0.2"
+  }
+}
