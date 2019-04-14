@@ -1,10 +1,11 @@
 const http = require('http');
-const get_project_info = require('./spider/project_info');
-get_project_info('vue-colorful-background').then(info => {
-  console.log(info);
-});
+const handle_request = require('./handle_request');
 
 http.createServer((request, response) => {
-  response.writeHead(200, { 'Content-Type': 'text-plain' });
-  response.end();
+  response.writeHead(200, {'Content-Type': 'application/json'});
+  handle_request(request).then(info => {
+    response.end(JSON.stringify(info));
+  }).catch(() => {
+    response.end();
+  });
 }).listen(8080);
