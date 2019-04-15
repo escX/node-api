@@ -6,26 +6,35 @@ const dispatch = ({reqUrl, reqMethod}) => {
     const parseUrl = url.parse(reqUrl, true);
     const [pathname, query] = [parseUrl.pathname, parseUrl.query];
 
+    const pathArray = pathname.split('/');
+    const dir = pathArray[1];
+    const file = pathArray[2];
+    const source = pathArray[3];
+
+    if (!apiDir.includes(dir)) {
+      reject({
+        code: 403,
+        error: '没有访问权限'
+      });
+      return false;
+    }
+
     try {
-      const pathArray = pathname.split('/');
-      const dir = pathArray[1];
-      const file = pathArray[2];
-      const source = pathArray[3];
-      if (apiDir.includes(dir)) {
-        require(`./${dir}/${file}`)({
-          query,
-          source,
-          method: reqMethod
-        }).then(info => {
-          resolve(info);
-        }).catch(() => {
-          reject();
-        });
-      } else {
-        reject();
-      }
-    } catch (err) {
-      reject();
+      const api = require(`./${dir}/${file}`);
+      api({
+        query,
+        source,
+        method: reqMethod
+      }).then(info => {
+        resolve(info);
+      }).catch(({code, error}) => {
+        reject({code, error});
+      });
+    } catch (ex) {
+      reject({
+        code: 404,
+        error: '接口不存在'
+      });
     }
   });
 };
@@ -35,8 +44,8 @@ const handle_request = request => {
     const [reqUrl, reqMethod] = [request.url, request.method];
     dispatch({reqUrl, reqMethod}).then(info => {
       resolve(info);
-    }).catch(() => {
-      reject();
+    }).catch(({code, error}) => {
+      reject({code, error});
     });
   });
 };
