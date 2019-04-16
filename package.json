@@ -4,7 +4,7 @@
   "description": "provide api with nodejs",
   "main": "index.js",
   "scripts": {
-    "serve": "node serve.js"
+    "serve": "node server.js"
   },
   "author": "escX",
   "license": "MIT",
