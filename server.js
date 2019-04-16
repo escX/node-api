@@ -4,8 +4,9 @@ const handle_request = require('./handle_request');
 http.createServer((request, response) => {
   const header = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'PUT, GET, POST, DELETE, OPTIONS'
+    'Access-Control-Allow-Methods': 'PUT, GET, POST, DELETE, OPTIONS',
+    'Access-Control-Allow-Origin': 'https://escx.github.io',
+    'Vary': 'Origin'
   };
 
   handle_request(request).then(info => {
