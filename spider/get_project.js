@@ -1,16 +1,6 @@
 const cheerio = require('cheerio');
 const superagent = require('superagent');
 
-const info = {
-  describe: '',
-  homepage: '',
-  examplepage: ''
-};
-
-const setInfo = (key, value) => {
-  info[key] = value;
-}
-
 const requestHome = homeUrl => {
   return new Promise((resolve, reject) => {
     superagent.get(homeUrl).end((err, res) => {
@@ -22,16 +12,17 @@ const requestHome = homeUrl => {
         return false;
       }
 
-      setInfo('homepage', homeUrl);
+      let describe = '';
 
       try {
         const $ = cheerio.load(res.text);
-        setInfo('describe', $('[itemprop="about"]').text().trim());
-      } catch (ex) {
-        setInfo('describe', '');
-      }
+        describe = $('[itemprop="about"]').text().trim();
+      } catch (ex) {}
 
-      resolve();
+      resolve({
+        home: homeUrl,
+        describe
+      });
     });
   });
 };
@@ -39,14 +30,13 @@ const requestHome = homeUrl => {
 const requestExample = exampleUrl => {
   return new Promise((resolve, reject) => {
     superagent.get(exampleUrl).end(err => {
+      let example = exampleUrl;
+
       if (err) {
-        setInfo('examplepage', '');
-        resolve();
-        return false;
+        example = '';
       }
 
-      setInfo('examplepage', exampleUrl);
-      resolve();
+      resolve({example});
     });
   });
 };
@@ -66,8 +56,8 @@ module.exports = projectName => {
   const promiseExample = requestExample(exampleUrl);
 
   return new Promise((resolve, reject) => {
-    Promise.all([promiseHome, promiseExample]).then(() => {
-      resolve(info);
+    Promise.all([promiseHome, promiseExample]).then(info => {
+      resolve(Object.assign({}, ...info));
     }).catch(({code, error}) => {
       reject({code, error});
     });
